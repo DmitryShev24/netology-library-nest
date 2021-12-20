@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
-import { BooksController } from './app.controller';
-import { BooksService } from './books/books.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { BookModule } from './books/book.module';
+
+require('dotenv').config();
 
 @Module({
-  controllers: [BooksController],
-  providers: [BooksService],
+  imports: [
+    MongooseModule.forRoot(process.env.MONGODB_CONNECTION_STRING!),
+    BookModule,
+  ],
 })
-export class BookModule {}
+export class AppModule {}

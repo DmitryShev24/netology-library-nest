@@ -1,32 +1,41 @@
+import { Connection, Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { IBook } from './book';
+import { Book, BookDocument } from './book.model';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+
+interface CreateBookDto {
+  title: Book['title'];
+  description: Book['description'];
+  authors: Book['authors'];
+  favorite: Book['favorite'];
+  fileCover: Book['fileCover'];
+}
 
 @Injectable()
 export class BooksService {
   books: Array<IBook>;
 
-  constructor() {
-    this.books = [];
+  constructor(
+    @InjectModel(Book.name)
+    @InjectConnection()
+    private bookModel: Model<BookDocument>,
+  ) {}
+
+  public createBook(data: IBook): Promise<Book> {
+    const book = new this.bookModel(data);
+    return book.save();
   }
 
-  createBook(book: IBook) {
-    this.books.push(book);
+  public updateBook(id: string, data: IBook): any {
+    return this.bookModel.findOneAndUpdate({ _id: id }, data);
   }
-  getBook(id: number) {
-    return this.books.filter((book) => book.id == id);
+
+  public delete(id: string): any {
+    return this.bookModel.findOneAndRemove({ _id: id });
   }
-  getBooks() {
-    return this.books;
-  }
-  updateBook(id: number, title: string, desc: string) {
-    return this.books.map((obj) => {
-      if (obj.id === id) {
-        return { ...obj, title, desc };
-      }
-      return obj;
-    });
-  }
-  deleteBook(id: number) {
-    this.books = this.books.filter((book) => book.id !== id);
+
+  public getAll(): Promise<BookDocument[]> {
+    return this.bookModel.find().exec();
   }
 }
