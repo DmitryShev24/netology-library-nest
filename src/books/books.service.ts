@@ -38,4 +38,8 @@ export class BooksService {
   public getAll(): Promise<BookDocument[]> {
     return this.bookModel.find().exec();
   }
+
+  public findOneById(id: number): any {
+    return this.bookModel.findOne({ _id: id });
+  }
 }
